@@ -1,4 +1,4 @@
-import { glob, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import { glob, readFile, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
 
 import { loadConfig } from "./core/config.ts";
 import { sortPackageJson } from "./sort.ts";
@@ -69,12 +69,13 @@ export const sortOneFile = async (
 };
 
 const writeFileAtomically = async (file: string, contents: string): Promise<void> => {
-  const mode = (await stat(file)).mode;
-  const temp = `${file}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;
+  const target = await realpath(file);
+  const mode = (await stat(target)).mode;
+  const temp = `${target}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;
 
   try {
     await writeFile(temp, contents, { mode });
-    await rename(temp, file);
+    await rename(temp, target);
   } catch (error) {
     await rm(temp, { force: true });
     throw error;
