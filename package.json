@@ -1,0 +1,58 @@
+{
+  "name": "pkg-json-order",
+  "version": "0.1.0",
+  "description": "Configurable package.json field sorter with per-field inner sorters.",
+  "keywords": [
+    "format",
+    "order",
+    "package-json",
+    "sort"
+  ],
+  "license": "MIT",
+  "author": "Takuto Nagami",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/logica-oss/pkg-json-order.git"
+  },
+  "bin": {
+    "pkg-json-order": "./dist/bin/pkg-json-order.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bun -b tsdown",
+    "check": "bun -b tsc --noEmit",
+    "format": "bun -b sort-package-json && bun -b oxfmt --write",
+    "knip": "bun -b knip-bun",
+    "lint": "bun -b oxlint --fix",
+    "test": "bun -b vitest run"
+  },
+  "dependencies": {
+    "jiti": "2.7.0"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.2",
+    "@types/node": "26.6.3",
+    "knip": "6.39.0",
+    "oxfmt": "0.71.0",
+    "oxlint": "1.86.0",
+    "oxlint-tsgolint": "7.0.2003",
+    "sort-package-json": "4.0.0",
+    "tsdown": "0.23.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  }
+}
