@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 
-import { DEFAULT_IGNORE, DEFAULT_PATTERNS, sortFiles, sortStdin } from "../cli.ts";
+import { sortFiles, sortStdin } from "../cli.ts";
 
 const showHelp = (): void => {
   console.log(`Usage: pkg-json-order [options] [file/glob ...]
@@ -19,7 +19,13 @@ If file/glob is omitted, './package.json' is processed.
 };
 
 const parseCli = (): {
-  options: { check: boolean; quiet: boolean; stdin: boolean; ignore: string[]; recursive: boolean };
+  options: {
+    check: boolean;
+    quiet: boolean;
+    stdin: boolean;
+    ignore?: string[] | undefined;
+    recursive?: boolean | undefined;
+  };
   patterns: string[];
 } => {
   const { values, positionals } = parseArgs({
@@ -27,8 +33,8 @@ const parseCli = (): {
       check: { type: "boolean", short: "c", default: false },
       quiet: { type: "boolean", short: "q", default: false },
       stdin: { type: "boolean", default: false },
-      ignore: { type: "string", short: "i", multiple: true, default: DEFAULT_IGNORE },
-      recursive: { type: "boolean", short: "r", default: false },
+      ignore: { type: "string", short: "i", multiple: true },
+      recursive: { type: "boolean", short: "r" },
       help: { type: "boolean", short: "h", default: false },
     },
     allowPositionals: true,
@@ -42,10 +48,10 @@ const parseCli = (): {
       check: values.check ?? false,
       quiet: values.quiet ?? false,
       stdin: values.stdin ?? false,
-      ignore: values.ignore ?? DEFAULT_IGNORE,
-      recursive: values.recursive ?? false,
+      ignore: values.ignore,
+      recursive: values.recursive,
     },
-    patterns: positionals.length > 0 ? positionals : DEFAULT_PATTERNS,
+    patterns: positionals,
   };
 };
 

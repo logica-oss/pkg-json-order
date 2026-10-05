@@ -9,6 +9,10 @@ reviews:
     - "!.github/instructions/**"
     - "!.github/copilot-instructions.md"
 
+  path_instructions:
+    - path: "src/defaults/dependencies.ts"
+      instructions: "Do not flag cwd-based yarn/pnpm marker detection; this matches upstream sort-package-json behavior and keeps the FieldSorter signature simple."
+
   auto_review:
     enabled: true
     drafts: false

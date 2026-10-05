@@ -7,8 +7,8 @@ export interface CliOptions {
   check: boolean;
   quiet: boolean;
   stdin: boolean;
-  ignore: string[];
-  recursive: boolean;
+  ignore?: string[] | undefined;
+  recursive?: boolean | undefined;
 }
 
 export const DEFAULT_PATTERNS = ["package.json"];
@@ -88,17 +88,18 @@ export const reportResults = (
 
 export const sortFiles = async (
   patterns: string[],
-  options: { check: boolean; quiet: boolean; ignore?: string[]; recursive?: boolean },
+  options: {
+    check: boolean;
+    quiet: boolean;
+    ignore?: string[] | undefined;
+    recursive?: boolean | undefined;
+  },
 ): Promise<void> => {
   const loaded = await loadConfig(process.cwd());
   const ignore = [...(options.ignore ?? loaded.ignore ?? DEFAULT_IGNORE)];
   const recursive = options.recursive ?? loaded.recursive ?? false;
   const resolvedPatterns =
-    patterns.length === 0 || (patterns.length === 1 && patterns[0] === "package.json")
-      ? recursive
-        ? RECURSIVE_PATTERNS
-        : DEFAULT_PATTERNS
-      : patterns;
+    patterns.length === 0 ? (recursive ? RECURSIVE_PATTERNS : DEFAULT_PATTERNS) : patterns;
   const files = await collectFiles(resolvedPatterns, ignore);
   if (files.length === 0) {
     console.error("No matching files.");

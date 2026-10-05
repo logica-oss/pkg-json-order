@@ -57,8 +57,11 @@ export const sortPrettierConfig: FieldSorter = (value, root) => {
     "overrides",
     onArrayValue((items) =>
       items.map((item) => {
-        const target = isObject(item) ? sortKeys(item) : item;
-        return overField("options", alphabetical)(isObject(target) ? target : {}, root);
+        if (!isObject(item)) {
+          return item;
+        }
+        const target = sortKeys(item);
+        return overField("options", alphabetical)(target, root);
       }),
     ),
   )(sorted, root);
