@@ -30,6 +30,7 @@ const orderRootKeys = (root: JsonObject, order: readonly string[]): JsonObject =
   const extra = Object.keys(root)
     .filter((field) => !order.includes(field))
     .toSorted();
+
   const underscore = extra.filter((field) => field.startsWith("_"));
   const rest = extra.filter((field) => !field.startsWith("_"));
 
@@ -54,9 +55,11 @@ export function sortWithResolved(value: unknown, config: Required<PkgJsonOrderCo
     const indent = detectIndent(value);
     const newline = detectNewline(value);
     const trailingNewline = value.endsWith("\n") ? "\n" : "";
+
     const parsed: unknown = JSON.parse(value);
     const sorted = sortParsed(parsed, config);
     const text = JSON.stringify(sorted, null, indent) + trailingNewline;
+
     return newline === "\r\n" ? text.replaceAll("\n", "\r\n") : text;
   }
 

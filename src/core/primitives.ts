@@ -6,6 +6,7 @@ export const isObject = (value: unknown): value is JsonObject => {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
   }
+
   return Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null;
 };
 
@@ -14,6 +15,7 @@ const toEntries = (value: JsonObject, keys: readonly string[]): Array<[string, u
 
 export const sortKeys = (value: JsonObject, order?: readonly string[]): JsonObject => {
   const rank = order === undefined ? undefined : new Map(order.map((key, index) => [key, index]));
+
   const sorted = Object.keys(value).toSorted((a, b) => {
     if (rank !== undefined) {
       const ra = rank.get(a) ?? Number.POSITIVE_INFINITY;
@@ -24,6 +26,7 @@ export const sortKeys = (value: JsonObject, order?: readonly string[]): JsonObje
     }
     return a < b ? -1 : a > b ? 1 : 0;
   });
+
   return Object.fromEntries(toEntries(value, sorted));
 };
 
@@ -64,6 +67,7 @@ export const detectIndent = (text: string): string => {
   let spaces = 0;
   let tabs = 0;
   let spaceWidth = 0;
+
   for (const line of text.split("\n")) {
     const match = /^( +|\t+)/.exec(line);
     if (match === null) {
@@ -82,11 +86,13 @@ export const detectIndent = (text: string): string => {
   if (tabs > spaces) {
     return "\t";
   }
+
   return spaceWidth > 0 ? " ".repeat(spaceWidth) : "  ";
 };
 
 export const detectNewline = (text: string): string => {
   const crlf = (text.match(/\r\n/g) ?? []).length;
   const lf = (text.match(/(?<!\r)\n/g) ?? []).length;
+
   return crlf > lf ? "\r\n" : "\n";
 };

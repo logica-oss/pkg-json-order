@@ -47,6 +47,7 @@ export const loadConfig = async (cwd: string): Promise<PkgJsonOrderConfig> => {
   if (configPath === undefined) {
     return {};
   }
+
   const jiti = createJiti(import.meta.url);
   const loaded = await jiti.import(configPath, { default: true });
   if (!isConfig(loaded)) {
@@ -54,6 +55,7 @@ export const loadConfig = async (cwd: string): Promise<PkgJsonOrderConfig> => {
       `Invalid config in ${path.basename(configPath)}: default export must be an object`,
     );
   }
+
   return loaded;
 };
 

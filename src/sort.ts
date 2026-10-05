@@ -14,11 +14,14 @@ export function sortPackageJson<T extends JsonObject>(value: T, options?: PkgJso
 export function sortPackageJson(value: string, options?: PkgJsonOrderConfig): string;
 export function sortPackageJson(value: unknown, options: PkgJsonOrderConfig = {}): unknown {
   const config = resolveConfig(options, DEFAULTS);
+
   if (typeof value === "string") {
     return sortWithResolved(value, config);
   }
+
   if (isObject(value)) {
     return sortWithResolved(value, config);
   }
+
   return value;
 }
