@@ -68,13 +68,26 @@ export const sortOneFile = async (
   }
 };
 
+const isErrnoException = (error: unknown): error is NodeJS.ErrnoException =>
+  typeof error === "object" && error !== null && "code" in error;
+
 const writeFileAtomically = async (file: string, contents: string): Promise<void> => {
   const target = await realpath(file);
   const mode = (await stat(target)).mode & 0o777;
   const temp = `${target}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;
 
   try {
-    await writeFile(temp, contents, { mode });
+    await writeFile(temp, contents, { flag: "wx", mode });
+  } catch (error) {
+    if (isErrnoException(error) && error.code === "EEXIST") {
+      throw error;
+    }
+
+    await rm(temp, { force: true });
+    throw error;
+  }
+
+  try {
     await chmod(temp, mode);
     await rename(temp, target);
   } catch (error) {

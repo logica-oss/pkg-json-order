@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -11,7 +11,7 @@ let previousCwd = "";
 
 beforeEach(() => {
   previousCwd = process.cwd();
-  dir = path.join(tmpdir(), `pkg-json-order-cli-${Date.now()}-${Math.random()}`);
+  dir = mkdtempSync(path.join(tmpdir(), "pkg-json-order-cli-"));
   mkdirSync(path.join(dir, "node_modules", "root-dep"), { recursive: true });
   mkdirSync(path.join(dir, "packages", "app"), { recursive: true });
   mkdirSync(path.join(dir, "packages", "app", "node_modules", "dep"), { recursive: true });
