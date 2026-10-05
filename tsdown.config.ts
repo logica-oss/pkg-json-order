@@ -10,6 +10,6 @@ export default defineConfig({
   outDir: "dist",
   platform: "node",
   sourcemap: false,
-  target: "node20",
+  target: "node22",
   treeshake: true,
 });

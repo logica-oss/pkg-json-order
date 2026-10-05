@@ -1,16 +1,13 @@
 #!/usr/bin/env node
-import { readFile, writeFile } from "node:fs/promises";
+import { glob, readFile, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 
-import { glob } from "tinyglobby";
-
-import { loadConfig } from "../index.ts";
-import { sortPackageJson } from "../sort.ts";
+import { loadConfig, sortPackageJson } from "../index.ts";
 
 const showHelp = (): void => {
   console.log(`Usage: pkg-json-order [options] [file/glob ...]
 
-Sort package.json files with .pkg-json-order.{js,ts} config.
+Sort package.json files with .pkg-json-order.{ts,js} config.
 If file/glob is omitted, './package.json' is processed.
 
   -c, --check   Check if files are sorted
@@ -98,7 +95,10 @@ const sortFiles = async (
   patterns: string[],
   options: { check: boolean; quiet: boolean; ignore: string[] },
 ): Promise<void> => {
-  const files = await glob(patterns, { ignore: options.ignore });
+  const files: string[] = [];
+  for await (const file of glob(patterns, { exclude: options.ignore })) {
+    files.push(file);
+  }
   if (files.length === 0) {
     console.error("No matching files.");
     process.exitCode = 2;
