@@ -1,5 +1,4 @@
-export { defineConfig, type PkgJsonOrderConfig } from "./config.ts";
-export { defaultFieldOrder, defaultFieldSorters, type FieldSorter } from "./defaults.ts";
-export { loadConfig, findConfigPath } from "./load-config.ts";
+export { defineConfig, loadConfig, type PkgJsonOrderConfig } from "./config.ts";
+export { defaultFieldOrder, defaultFieldSorters } from "./defaults.ts";
 export { sortPackageJson, type SortOptions } from "./sort.ts";
-export type { JsonObject, JsonValue } from "./primitives.ts";
+export type { FieldSorter, JsonObject, JsonValue } from "./primitives.ts";

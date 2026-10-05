@@ -9,10 +9,16 @@ import {
   sortKeysBy,
   uniqAndSortStrings,
   uniqStrings,
+  type FieldSorter,
   type JsonObject,
 } from "./primitives.ts";
 
-export type FieldSorter = (value: unknown, root: JsonObject) => unknown;
+const PERSON_ORDER = ["name", "email", "url"];
+const TYPE_URL_ORDER = ["type", "url"];
+
+const sortPersonList = onArrayValue((items) =>
+  items.map((item) => (isObject(item) ? sortKeys(item, PERSON_ORDER) : item)),
+);
 
 const sortByCompare = (compare: (a: string, b: string) => number) =>
   onObjectValue((value) => sortKeysBy(value, compare));
@@ -300,16 +306,12 @@ export const defaultFieldSorters: Record<string, FieldSorter> = {
   categories: uniqStrings,
   keywords: uniqStrings,
   bugs: bySubOrder(["url", "email"]),
-  repository: bySubOrder(["type", "url"]),
-  funding: bySubOrder(["type", "url"]),
-  license: bySubOrder(["type", "url"]),
-  author: bySubOrder(["name", "email", "url"]),
-  maintainers: onArrayValue((items) =>
-    items.map((item) => (isObject(item) ? sortKeys(item, ["name", "email", "url"]) : item)),
-  ),
-  contributors: onArrayValue((items) =>
-    items.map((item) => (isObject(item) ? sortKeys(item, ["name", "email", "url"]) : item)),
-  ),
+  repository: bySubOrder(TYPE_URL_ORDER),
+  funding: bySubOrder(TYPE_URL_ORDER),
+  license: bySubOrder(TYPE_URL_ORDER),
+  author: bySubOrder(PERSON_ORDER),
+  maintainers: sortPersonList,
+  contributors: sortPersonList,
   exports: sortExports,
   bin: alphabetical,
   directories: bySubOrder(["lib", "bin", "man", "doc", "example", "test"]),

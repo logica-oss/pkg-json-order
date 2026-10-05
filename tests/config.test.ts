@@ -4,10 +4,12 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { defineConfig, resolveConfig } from "../src/config.ts";
-import { findConfigPath, loadConfig } from "../src/load-config.ts";
+import { defaultFieldOrder, defaultFieldSorters } from "../src/defaults.ts";
+import { defineConfig, loadConfig, resolveConfig, __test__ as configTest } from "../src/config.ts";
 
 const makeDir = (): string => mkdtempSync(path.join(tmpdir(), "pkg-json-order-config-"));
+
+const customSorter = (): string => "custom";
 
 describe("defineConfig", () => {
   it("returns the given config as-is", () => {
@@ -17,20 +19,30 @@ describe("defineConfig", () => {
 });
 
 describe("resolveConfig", () => {
-  it("fills missing fields with defaults", () => {
-    expect(resolveConfig({})).toEqual({ fields: [], sorters: {} });
+  it("uses defaults when fields and sorters are missing", () => {
+    const resolved = resolveConfig({});
+    expect(resolved.fields).toEqual(defaultFieldOrder);
+    expect(resolved.sorters).toEqual(defaultFieldSorters);
+  });
+
+  it("prepends configured fields before defaults", () => {
+    const resolved = resolveConfig({ fields: ["custom"], sorters: { bin: customSorter } });
+    expect(resolved.fields.slice(0, 1)).toEqual(["custom"]);
+    expect(resolved.fields.slice(1)).toEqual(defaultFieldOrder);
+    expect(resolved.sorters["bin"]).toBe(customSorter);
+    expect(resolved.sorters["scripts"]).toBe(defaultFieldSorters["scripts"]);
   });
 });
 
 describe("findConfigPath", () => {
-  it("prefers js over ts and returns undefined when absent", () => {
+  it("prefers ts over js and returns undefined when absent", () => {
     const dir = makeDir();
     try {
-      expect(findConfigPath(dir)).toBeUndefined();
-      writeFileSync(path.join(dir, ".pkg-json-order.ts"), "export default {}");
-      expect(findConfigPath(dir)?.endsWith(".pkg-json-order.ts")).toBe(true);
+      expect(configTest.findConfigPath(dir)).toBeUndefined();
       writeFileSync(path.join(dir, ".pkg-json-order.js"), "export default {}");
-      expect(findConfigPath(dir)?.endsWith(".pkg-json-order.js")).toBe(true);
+      expect(configTest.findConfigPath(dir)?.endsWith(".pkg-json-order.js")).toBe(true);
+      writeFileSync(path.join(dir, ".pkg-json-order.ts"), "export default {}");
+      expect(configTest.findConfigPath(dir)?.endsWith(".pkg-json-order.ts")).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

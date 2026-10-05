@@ -1,5 +1,6 @@
 export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
 export type JsonObject = Record<string, unknown>;
+export type FieldSorter = (value: unknown, root: JsonObject) => unknown;
 
 export const isObject = (value: unknown): value is JsonObject => {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -34,22 +35,23 @@ export const sortKeysBy = (
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === "string");
 
-const sortStrings = (value: unknown): unknown => (isStringArray(value) ? value.toSorted() : value);
-
 export const uniqStrings = (value: unknown): unknown =>
   isStringArray(value) ? [...new Set(value)] : value;
 
-export const uniqAndSortStrings = (value: unknown): unknown => sortStrings(uniqStrings(value));
+export const uniqAndSortStrings = (value: unknown): unknown =>
+  isStringArray(value) ? [...new Set(value)].toSorted() : value;
 
-export const onObjectValue = (fn: (value: JsonObject, root: JsonObject) => unknown) => {
-  return (value: unknown, root: JsonObject): unknown => (isObject(value) ? fn(value, root) : value);
+export const onObjectValue = (
+  fn: (value: JsonObject, root: JsonObject) => unknown,
+): FieldSorter => {
+  return (value, root) => (isObject(value) ? fn(value, root) : value);
 };
 
 export const onArrayValue = (fn: (value: unknown[]) => unknown) => {
   return (value: unknown): unknown => (Array.isArray(value) ? fn(value) : value);
 };
 
-export const overField = (field: string, sort: (value: unknown, root: JsonObject) => unknown) => {
+export const overField = (field: string, sort: FieldSorter) => {
   return (object: JsonObject, root: JsonObject): JsonObject => {
     if (object[field] === undefined) {
       return object;

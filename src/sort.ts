@@ -1,20 +1,46 @@
+import { resolveConfig, type PkgJsonOrderConfig } from "./config.ts";
 import {
-  applyFieldSorters,
-  mergeFieldOrder,
-  orderRootKeys,
-  resolveConfig,
-  type PkgJsonOrderConfig,
-} from "./config.ts";
-import { defaultFieldOrder, defaultFieldSorters } from "./defaults.ts";
-import { detectIndent, detectNewline, isObject, type JsonObject } from "./primitives.ts";
+  detectIndent,
+  detectNewline,
+  isObject,
+  sortKeys,
+  type FieldSorter,
+  type JsonObject,
+} from "./primitives.ts";
 
-export interface SortOptions extends PkgJsonOrderConfig {}
+export type SortOptions = PkgJsonOrderConfig;
+
+const applyFieldSorters = (
+  sorted: JsonObject,
+  root: JsonObject,
+  sorters: Record<string, FieldSorter>,
+): JsonObject => {
+  const result: JsonObject = { ...sorted };
+
+  for (const [field, sorter] of Object.entries(sorters)) {
+    if (result[field] === undefined) {
+      continue;
+    }
+    result[field] = sorter(result[field], root);
+  }
+
+  return result;
+};
+
+const orderRootKeys = (root: JsonObject, order: readonly string[]): JsonObject => {
+  const known = order.filter((field) => field in root);
+  const extra = Object.keys(root)
+    .filter((field) => !order.includes(field))
+    .toSorted();
+  const underscore = extra.filter((field) => field.startsWith("_"));
+  const rest = extra.filter((field) => !field.startsWith("_"));
+
+  return sortKeys(root, [...known, ...rest, ...underscore]);
+};
 
 const sortObject = (root: JsonObject, config: Required<PkgJsonOrderConfig>): JsonObject => {
-  const order = mergeFieldOrder(config.fields, defaultFieldOrder);
-  const sorters = { ...defaultFieldSorters, ...config.sorters };
-  const ordered = orderRootKeys(root, order);
-  return applyFieldSorters(ordered, root, sorters);
+  const ordered = orderRootKeys(root, config.fields);
+  return applyFieldSorters(ordered, root, config.sorters);
 };
 
 const sortParsed = (value: unknown, config: Required<PkgJsonOrderConfig>): unknown =>
@@ -24,6 +50,7 @@ export function sortPackageJson<T extends JsonObject>(value: T, options?: SortOp
 export function sortPackageJson(value: string, options?: SortOptions): string;
 export function sortPackageJson(value: unknown, options: SortOptions = {}): unknown {
   const config = resolveConfig(options);
+
   if (typeof value === "string") {
     const indent = detectIndent(value);
     const newline = detectNewline(value);
@@ -33,5 +60,6 @@ export function sortPackageJson(value: unknown, options: SortOptions = {}): unkn
     const text = JSON.stringify(sorted, null, indent) + trailingNewline;
     return newline === "\r\n" ? text.replaceAll("\n", "\r\n") : text;
   }
+
   return sortParsed(value, config);
 }
