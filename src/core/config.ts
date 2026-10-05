@@ -3,22 +3,35 @@ import path from "node:path";
 
 import { createJiti } from "jiti";
 
-import { defaultFieldOrder, defaultFieldSorters } from "./defaults.ts";
 import type { FieldSorter } from "./primitives.ts";
 
 export interface PkgJsonOrderConfig {
   fields?: readonly string[];
   sorters?: Record<string, FieldSorter>;
+  ignore?: readonly string[];
+  recursive?: boolean;
+}
+
+export interface ResolvedDefaults {
+  fields: readonly string[];
+  sorters: Record<string, FieldSorter>;
+  ignore: readonly string[];
+  recursive: boolean;
 }
 
 export const defineConfig = (config: PkgJsonOrderConfig): PkgJsonOrderConfig => config;
 
-export const resolveConfig = (config: PkgJsonOrderConfig): Required<PkgJsonOrderConfig> => ({
+export const resolveConfig = (
+  config: PkgJsonOrderConfig,
+  defaults: ResolvedDefaults,
+): Required<PkgJsonOrderConfig> => ({
   fields:
     config.fields === undefined
-      ? defaultFieldOrder
-      : [...new Set([...config.fields, ...defaultFieldOrder])],
-  sorters: { ...defaultFieldSorters, ...config.sorters },
+      ? [...defaults.fields]
+      : [...new Set([...config.fields, ...defaults.fields])],
+  sorters: { ...defaults.sorters, ...config.sorters },
+  ignore: config.ignore === undefined ? [...defaults.ignore] : [...config.ignore],
+  recursive: config.recursive ?? defaults.recursive,
 });
 
 const CONFIG_NAMES = [".pkg-json-order.ts", ".pkg-json-order.js"] as const;

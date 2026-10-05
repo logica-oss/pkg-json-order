@@ -1,65 +1,24 @@
-import { resolveConfig, type PkgJsonOrderConfig } from "./config.ts";
-import {
-  detectIndent,
-  detectNewline,
-  isObject,
-  sortKeys,
-  type FieldSorter,
-  type JsonObject,
-} from "./primitives.ts";
+import { resolveConfig, type PkgJsonOrderConfig, type ResolvedDefaults } from "./core/config.ts";
+import { sortWithResolved } from "./core/sort.ts";
+import { defaultFieldOrder, defaultFieldSorters } from "./defaults/index.ts";
+import { isObject, type JsonObject } from "./core/primitives.ts";
 
-export type SortOptions = PkgJsonOrderConfig;
-
-const applyFieldSorters = (
-  sorted: JsonObject,
-  root: JsonObject,
-  sorters: Record<string, FieldSorter>,
-): JsonObject => {
-  const result: JsonObject = { ...sorted };
-
-  for (const [field, sorter] of Object.entries(sorters)) {
-    if (result[field] === undefined) {
-      continue;
-    }
-    result[field] = sorter(result[field], root);
-  }
-
-  return result;
+const DEFAULTS: ResolvedDefaults = {
+  fields: defaultFieldOrder,
+  sorters: defaultFieldSorters,
+  ignore: [],
+  recursive: false,
 };
 
-const orderRootKeys = (root: JsonObject, order: readonly string[]): JsonObject => {
-  const known = order.filter((field) => field in root);
-  const extra = Object.keys(root)
-    .filter((field) => !order.includes(field))
-    .toSorted();
-  const underscore = extra.filter((field) => field.startsWith("_"));
-  const rest = extra.filter((field) => !field.startsWith("_"));
-
-  return sortKeys(root, [...known, ...rest, ...underscore]);
-};
-
-const sortObject = (root: JsonObject, config: Required<PkgJsonOrderConfig>): JsonObject => {
-  const ordered = orderRootKeys(root, config.fields);
-  return applyFieldSorters(ordered, root, config.sorters);
-};
-
-const sortParsed = (value: unknown, config: Required<PkgJsonOrderConfig>): unknown =>
-  isObject(value) ? sortObject(value, config) : value;
-
-export function sortPackageJson<T extends JsonObject>(value: T, options?: SortOptions): T;
-export function sortPackageJson(value: string, options?: SortOptions): string;
-export function sortPackageJson(value: unknown, options: SortOptions = {}): unknown {
-  const config = resolveConfig(options);
-
+export function sortPackageJson<T extends JsonObject>(value: T, options?: PkgJsonOrderConfig): T;
+export function sortPackageJson(value: string, options?: PkgJsonOrderConfig): string;
+export function sortPackageJson(value: unknown, options: PkgJsonOrderConfig = {}): unknown {
+  const config = resolveConfig(options, DEFAULTS);
   if (typeof value === "string") {
-    const indent = detectIndent(value);
-    const newline = detectNewline(value);
-    const trailingNewline = value.endsWith("\n") ? "\n" : "";
-    const parsed: unknown = JSON.parse(value);
-    const sorted = sortParsed(parsed, config);
-    const text = JSON.stringify(sorted, null, indent) + trailingNewline;
-    return newline === "\r\n" ? text.replaceAll("\n", "\r\n") : text;
+    return sortWithResolved(value, config);
   }
-
-  return sortParsed(value, config);
+  if (isObject(value)) {
+    return sortWithResolved(value, config);
+  }
+  return value;
 }

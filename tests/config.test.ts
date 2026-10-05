@@ -4,8 +4,13 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { defaultFieldOrder, defaultFieldSorters } from "../src/defaults.ts";
-import { defineConfig, loadConfig, resolveConfig, __test__ as configTest } from "../src/config.ts";
+import {
+  defineConfig,
+  loadConfig,
+  resolveConfig,
+  __test__ as configTest,
+} from "../src/core/config.ts";
+import { defaultFieldOrder, defaultFieldSorters } from "../src/defaults/index.ts";
 
 const makeDir = (): string => mkdtempSync(path.join(tmpdir(), "pkg-json-order-config-"));
 
@@ -20,13 +25,29 @@ describe("defineConfig", () => {
 
 describe("resolveConfig", () => {
   it("uses defaults when fields and sorters are missing", () => {
-    const resolved = resolveConfig({});
+    const resolved = resolveConfig(
+      {},
+      {
+        fields: defaultFieldOrder,
+        sorters: defaultFieldSorters,
+        ignore: [],
+        recursive: false,
+      },
+    );
     expect(resolved.fields).toEqual(defaultFieldOrder);
     expect(resolved.sorters).toEqual(defaultFieldSorters);
   });
 
   it("prepends configured fields before defaults", () => {
-    const resolved = resolveConfig({ fields: ["custom"], sorters: { bin: customSorter } });
+    const resolved = resolveConfig(
+      { fields: ["custom"], sorters: { bin: customSorter } },
+      {
+        fields: defaultFieldOrder,
+        sorters: defaultFieldSorters,
+        ignore: [],
+        recursive: false,
+      },
+    );
     expect(resolved.fields.slice(0, 1)).toEqual(["custom"]);
     expect(resolved.fields.slice(1)).toEqual(defaultFieldOrder);
     expect(resolved.sorters["bin"]).toBe(customSorter);

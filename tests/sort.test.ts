@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { sortPackageJson } from "../src/sort.ts";
+import { sortPackageJson } from "../src/index.ts";
 
 describe("sortPackageJson", () => {
   it("orders top-level fields by default order", () => {
