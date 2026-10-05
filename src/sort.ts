@@ -1,7 +1,7 @@
 import { resolveConfig, type PkgJsonOrderConfig, type ResolvedDefaults } from "./core/config.ts";
+import { isObject, type JsonObject } from "./core/primitives.ts";
 import { sortWithResolved } from "./core/sort.ts";
 import { defaultFieldOrder, defaultFieldSorters } from "./defaults/index.ts";
-import { isObject, type JsonObject } from "./core/primitives.ts";
 
 const DEFAULTS: ResolvedDefaults = {
   fields: defaultFieldOrder,
