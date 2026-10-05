@@ -39,10 +39,12 @@ const parseCli = (): {
     },
     allowPositionals: true,
   });
+
   if (values.help) {
     showHelp();
     process.exit(0);
   }
+
   return {
     options: {
       check: values.check ?? false,
@@ -57,8 +59,9 @@ const parseCli = (): {
 
 try {
   const { options, patterns } = parseCli();
+
   if (options.stdin) {
-    await sortStdin();
+    await sortStdin(options);
   } else {
     await sortFiles(patterns, options);
   }
