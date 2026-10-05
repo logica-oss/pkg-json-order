@@ -11,6 +11,7 @@ export const sortEslintConfig: FieldSorter = (value, root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const base = [
     "files",
     "excludedFiles",
@@ -28,6 +29,7 @@ export const sortEslintConfig: FieldSorter = (value, root) => {
     "reportUnusedDisableDirectives",
   ];
   let sorted = sortKeys(value, base);
+
   sorted = overField("env", alphabetical)(sorted, root);
   sorted = overField("globals", alphabetical)(sorted, root);
   sorted = overField(
@@ -42,6 +44,7 @@ export const sortEslintConfig: FieldSorter = (value, root) => {
     ),
   )(sorted, root);
   sorted = overField("settings", alphabetical)(sorted, root);
+
   return sorted;
 };
 
@@ -49,10 +52,12 @@ export const sortPrettierConfig: FieldSorter = (value, root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const rest = Object.keys(value)
     .filter((key) => key !== "overrides")
     .toSorted();
   let sorted = sortKeys(value, [...rest, "overrides"]);
+
   sorted = overField(
     "overrides",
     onArrayValue((items) =>
@@ -65,5 +70,6 @@ export const sortPrettierConfig: FieldSorter = (value, root) => {
       }),
     ),
   )(sorted, root);
+
   return sorted;
 };

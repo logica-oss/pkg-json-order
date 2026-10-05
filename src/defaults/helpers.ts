@@ -61,10 +61,13 @@ export const bySubOrder =
     if (!isObject(value)) {
       return value;
     }
+
     const sorted = sortKeys(value, order);
+
     if (!deep) {
       return sorted;
     }
+
     return Object.fromEntries(
       Object.entries(sorted).map(([key, child]) => [
         key,

@@ -30,10 +30,12 @@ const shouldUseLocaleCompare = (root: JsonObject): boolean => {
   if (root["pnpm"] !== undefined) {
     return false;
   }
+
   const engines = root["engines"];
   if (isObject(engines) && typeof engines["npm"] === "string") {
     return true;
   }
+
   return !hasYarnOrPnpmMarker();
 };
 
@@ -41,6 +43,7 @@ export const sortDependencies: FieldSorter = (value, root) => {
   if (!isObject(value) || Object.keys(value).length < 2) {
     return value;
   }
+
   return (shouldUseLocaleCompare(root) ? localeAware : alphabetical)(value, root);
 };
 
@@ -48,7 +51,9 @@ export const sortWorkspaces: FieldSorter = (value, root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const ordered = sortKeys(value, ["packages", "catalog"]);
+
   return overField("packages", uniqAndSortStrings)(
     overField("catalog", sortDependencies)(ordered, root),
     root,

@@ -16,6 +16,7 @@ const DEFAULT_SCRIPTS = new Set([
 
 const groupScriptNames = (keys: string[], prefix = ""): string[] => {
   const groups = new Map<string, string[]>();
+
   for (const key of keys) {
     const rest = prefix === "" ? key : key.slice(prefix.length + 1);
     const index = rest.indexOf(":");
@@ -27,14 +28,18 @@ const groupScriptNames = (keys: string[], prefix = ""): string[] => {
       existing.push(key);
     }
   }
+
   return [...groups.keys()].toSorted().flatMap((group) => {
     const children = groups.get(group) ?? [];
     const nested = children.filter((key) => key !== group && key.startsWith(`${group}:`));
+
     if (children.length > 1 && nested.length > 0) {
       const direct = children.filter((key) => !nested.includes(key)).toSorted();
       direct.push(...groupScriptNames(nested, group));
+
       return direct;
     }
+
     return children.toSorted();
   });
 };
@@ -43,6 +48,7 @@ export const sortScripts: FieldSorter = (value, _root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const names = Object.keys(value);
   const prefixable = new Set<string>();
   const bare = names.map((name) => {
@@ -56,6 +62,7 @@ export const sortScripts: FieldSorter = (value, _root) => {
   const ordered = groupScriptNames([...new Set(bare)]).flatMap((key) =>
     prefixable.has(key) ? [`pre${key}`, key, `post${key}`] : [key],
   );
+
   return sortKeys(
     value,
     ordered.filter((key) => names.includes(key)),

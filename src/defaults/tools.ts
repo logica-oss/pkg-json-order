@@ -11,8 +11,10 @@ export const sortWireit: FieldSorter = (value, root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const names = Object.keys(value).toSorted();
   const entries: Array<[string, unknown]> = [];
+
   for (const name of names) {
     const script = value[name];
     if (!isObject(script)) {
@@ -28,6 +30,7 @@ export const sortWireit: FieldSorter = (value, root) => {
     )(sorted, root);
     entries.push([name, sorted]);
   }
+
   return Object.fromEntries(entries);
 };
 
@@ -35,6 +38,7 @@ export const sortPnpm: FieldSorter = (value, root) => {
   if (!isObject(value)) {
     return value;
   }
+
   const base = [
     "peerDependencyRules",
     "neverBuiltDependencies",
@@ -51,5 +55,6 @@ export const sortPnpm: FieldSorter = (value, root) => {
     "packageExtensions",
   ];
   const sorted = sortKeys(value, base);
+
   return overField("overrides", alphabetical)(sorted, root);
 };
