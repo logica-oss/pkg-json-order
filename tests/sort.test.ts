@@ -73,4 +73,24 @@ describe("sortPackageJson", () => {
     });
     expect(Object.keys(sorted.scripts ?? {})).toEqual(["build", "pretest", "test"]);
   });
+
+  it("preserves export condition order while sorting subpaths", () => {
+    const sorted = sortPackageJson({
+      name: "example",
+      exports: {
+        "./zebra": "./zebra.js",
+        "./apple": "./apple.js",
+        node: "./node.js",
+        import: "./import.js",
+        default: "./default.js",
+      },
+    });
+    expect(Object.keys(sorted.exports ?? {})).toEqual([
+      "./apple",
+      "./zebra",
+      "node",
+      "import",
+      "default",
+    ]);
+  });
 });
