@@ -51,6 +51,8 @@ export const sortByCompare = (compare: (a: string, b: string) => number) =>
 
 export const alphabetical: FieldSorter = onObjectValue((value) => sortKeys(value));
 
+export const keepOrder: FieldSorter = (value, _root) => value;
+
 export const localeAware: FieldSorter = onObjectValue((value) =>
   sortKeysBy(value, (a, b) => a.localeCompare(b, "en")),
 );

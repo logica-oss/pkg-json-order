@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { sortPackageJson } from "../src/index.ts";
+import { keepOrder, sortPackageJson } from "../src/index.ts";
 
 describe("sortPackageJson", () => {
   it("orders top-level fields by default order", () => {
@@ -66,12 +66,22 @@ describe("sortPackageJson", () => {
     ]);
   });
 
-  it("sorts scripts with pre/post grouping", () => {
+  it("keeps scripts and betterScripts order by default", () => {
     const sorted = sortPackageJson({
       name: "example",
       scripts: { test: "vitest", pretest: "lint", build: "tsc" },
+      betterScripts: { lint: "eslint", prelint: "echo", build: "tsc" },
     });
-    expect(Object.keys(sorted.scripts ?? {})).toEqual(["build", "pretest", "test"]);
+    expect(Object.keys(sorted.scripts ?? {})).toEqual(["test", "pretest", "build"]);
+    expect(Object.keys(sorted.betterScripts ?? {})).toEqual(["lint", "prelint", "build"]);
+  });
+
+  it("exposes keepOrder sorter that preserves existing order", () => {
+    const sorted = sortPackageJson(
+      { name: "example", custom: { b: 1, a: 2 } },
+      { fields: ["name", "custom"], sorters: { custom: keepOrder } },
+    );
+    expect(Object.keys(sorted["custom"] as Record<string, unknown>)).toEqual(["b", "a"]);
   });
 
   it("preserves export condition order while sorting subpaths", () => {
