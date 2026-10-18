@@ -66,12 +66,14 @@ describe("sortPackageJson", () => {
     ]);
   });
 
-  it("keeps scripts order by default", () => {
+  it("keeps scripts and betterScripts order by default", () => {
     const sorted = sortPackageJson({
       name: "example",
       scripts: { test: "vitest", pretest: "lint", build: "tsc" },
+      betterScripts: { lint: "eslint", prelint: "echo", build: "tsc" },
     });
     expect(Object.keys(sorted.scripts ?? {})).toEqual(["test", "pretest", "build"]);
+    expect(Object.keys(sorted.betterScripts ?? {})).toEqual(["lint", "prelint", "build"]);
   });
 
   it("exposes keepOrder sorter that preserves existing order", () => {
