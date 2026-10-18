@@ -4,6 +4,7 @@ export {
   bySubOrder,
   defaultFieldOrder,
   defaultFieldSorters,
+  keepOrder,
   localeAware,
   sortByCompare,
   sortDependencies,
