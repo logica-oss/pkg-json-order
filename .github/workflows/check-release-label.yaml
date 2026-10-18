@@ -14,8 +14,7 @@ jobs:
     name: Check (Release Label)
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      pull-requests: read
+    permissions: {}
     steps:
       - name: Check release label
         uses: logica-oss/actions-toolkit/check-release-label@497746a5e6d64835c883466163470ed7d71502b8 # v1.2.1
