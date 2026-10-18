@@ -13,12 +13,12 @@ import {
   alphabetical,
   bySubOrder,
   GIT_HOOKS,
+  keepOrder,
   PERSON_ORDER,
   sortPersonList,
   TYPE_URL_ORDER,
 } from "./helpers.ts";
 import { sortEslintConfig, sortPrettierConfig } from "./lint-format.ts";
-import { sortScripts } from "./scripts.ts";
 import { sortPnpm, sortWireit } from "./tools.ts";
 
 export const defaultFieldSorters: Record<string, FieldSorter> = {
@@ -37,8 +37,8 @@ export const defaultFieldSorters: Record<string, FieldSorter> = {
   files: uniqStrings,
   workspaces: sortWorkspaces,
   binary: bySubOrder(["module_name", "module_path", "remote_path", "package_name", "host"]),
-  scripts: sortScripts,
-  betterScripts: sortScripts,
+  scripts: keepOrder,
+  betterScripts: keepOrder,
   wireit: sortWireit,
   contributes: alphabetical,
   activationEvents: uniqStrings,
