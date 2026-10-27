@@ -11,9 +11,9 @@ export interface CliOptions {
   recursive?: boolean | undefined;
 }
 
-export const DEFAULT_PATTERNS = ["package.json"];
-export const RECURSIVE_PATTERNS = ["**/package.json"];
-export const DEFAULT_IGNORE = ["**/node_modules/**"];
+export const DEFAULT_PATTERNS: string[] = ["package.json"];
+export const RECURSIVE_PATTERNS: string[] = ["**/package.json"];
+export const DEFAULT_IGNORE: string[] = ["**/node_modules/**"];
 
 export const sortStdin = async (options?: { check: boolean; quiet: boolean }): Promise<void> => {
   process.stdin.setEncoding("utf8");
