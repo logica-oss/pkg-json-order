@@ -7,11 +7,11 @@ import {
   type FieldSorter,
 } from "../core/primitives.ts";
 
-export const PERSON_ORDER = ["name", "email", "url"];
+export const PERSON_ORDER: string[] = ["name", "email", "url"];
 
-export const TYPE_URL_ORDER = ["type", "url"];
+export const TYPE_URL_ORDER: string[] = ["type", "url"];
 
-export const GIT_HOOKS = [
+export const GIT_HOOKS: string[] = [
   "applypatch-msg",
   "pre-applypatch",
   "post-applypatch",
@@ -42,12 +42,13 @@ export const GIT_HOOKS = [
   "post-index-change",
 ];
 
-export const sortPersonList = onArrayValue((items) =>
+export const sortPersonList: FieldSorter = onArrayValue((items) =>
   items.map((item) => (isObject(item) ? sortKeys(item, PERSON_ORDER) : item)),
 );
 
-export const sortByCompare = (compare: (a: string, b: string) => number) =>
-  onObjectValue((value) => sortKeysBy(value, compare));
+export const sortByCompare: (compare: (a: string, b: string) => number) => FieldSorter = (
+  compare,
+) => onObjectValue((value) => sortKeysBy(value, compare));
 
 export const alphabetical: FieldSorter = onObjectValue((value) => sortKeys(value));
 

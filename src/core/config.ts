@@ -59,4 +59,4 @@ export const loadConfig = async (cwd: string): Promise<PkgJsonOrderConfig> => {
   return loaded;
 };
 
-export const __test__ = { findConfigPath };
+export const __test__: { findConfigPath: typeof findConfigPath } = { findConfigPath };
