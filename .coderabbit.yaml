@@ -12,6 +12,8 @@ reviews:
   path_instructions:
     - path: "src/defaults/dependencies.ts"
       instructions: "Do not flag cwd-based yarn/pnpm marker detection; this matches upstream sort-package-json behavior and keeps the FieldSorter signature simple."
+    - path: ".github/workflows/autofix.yaml"
+      instructions: "Accept by design (do not report): the synac step intentionally omits the version input to always use the latest release; do not suggest pinning a version."
 
   auto_review:
     enabled: true
